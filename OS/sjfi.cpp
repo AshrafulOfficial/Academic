@@ -40,8 +40,8 @@ int main(){
         cout<<"P"<<p[i]<<"\t\t\t"<<bt[i]<<"\t\t\t"<<wt[i]<<"\t\t\t"<<tat[i]<<endl;
     }
     cout<<endl;
-    a_wt = t_wt/n;
-    a_tat = t_tat/n;
+    a_wt = (float)t_wt/n;
+    a_tat = (float)t_tat/n;
 
     cout<<"The average waiting time: "<<a_wt<<endl;
     cout<<"Average Turn Around Time: "<<a_tat;
