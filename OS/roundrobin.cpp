@@ -4,16 +4,16 @@ int main(){
     int n,quantum, bt[30], wt[30], tat[30],rt[30],time = 0,t_wt=0, t_tat=0, i, j;
     bool done;
     cout<<"Enter the Number of Process: ";
-    cin>>n;
+    fin>>n;
     cout<<"Enter the Burst Time: "<<endl;
     for(i=0; i<n; i++){
         cout<<"P"<<i+1<<": ";
-        cin>>bt[i];
+        fin>>bt[i];
         rt[i] = bt[i];
     }
 
     cout<<"Enter the Time Quantum: ";
-    cin>>quantum;
+    fin>>quantum;
 
     for(i=0; i<n; i++){
         wt[i] = 0;

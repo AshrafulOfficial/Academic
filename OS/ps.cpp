@@ -5,12 +5,12 @@ int main(){
     float a_wt, a_tat;
 
     cout<<"Enter the number of process: ";
-    cin>>n;
+    fin>>n;
 
     cout<<"Enter the priority and Burst Time: ";
     for(i=0; i<n; i++){
         cout<<"P"<<i+1<<": ";
-        cin>>pr[i]>>bt[i];
+        fin>>pr[i]>>bt[i];
         p[i] = i+1;
     }
 

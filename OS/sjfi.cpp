@@ -4,13 +4,15 @@ int main(){
     int n, bt[30], wt[30], tat[30],p[30],t_wt=0, t_tat=0, i, j;
     float a_wt, a_tat;
 
-    cout<<"Enter the number of process:\n";
-    cin>>n;
+    fstream fin("F:/Academic/OS/input.txt");
 
-    cout<<"Enter the Burst Time:"<<endl;
+    //cout<<"Enter the number of process:\n";
+    fin>>n;
+
+    //cout<<"Enter the Burst Time:"<<endl;
     for(i=0; i<n; i++){
-        cout<<"P["<<i+1<<"]: ";
-        cin>>bt[i];
+        //cout<<"P["<<i+1<<"]: ";
+        fin>>bt[i];
         p[i] = i+1;
     }
 
