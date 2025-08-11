@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Teacher Profile</title>
+        <script>
+            function validateForm(){
+                const name = document.getElementById("name").value.trim();
+                if(name === ""){
+                    alert("Fill the name");
+                    return false;
+                }
+                if(!/^[a-zA-Z\s]+$/.test(name)){
+                    alert("Invalid Name");
+                    return false;
+                }
+
+                const subject = document.getElementById("sub").value.trim();
+                if(subject === ""){
+                    alert("Fill the subject");
+                    return false;
+                }
+                if(!/^[a-zA-Z\s]+$/.test(subject)){
+                    alert("Invalid Subject");
+                    return false;
+                }
+
+                const email = document.getElementById("email").value.trim();
+                if(email === ""){
+                    alert("fill the email");
+                    return false;
+                }
+
+                const phone = document.getElementById("phone").value.trim();
+                if(phone === ""){
+                    alert("fill the phone");
+                    return false;
+                }
+                if(!/^[0-9]{10,15}$/.test(phone)){
+                    alert("Invalid Number");
+                    return false;
+                }
+
+                return true;
+            }
+        </script>
+    </head>
+    <body>
+        <form action="submit.php" method="post" onsubmit="return validateForm();">
+            Name: <input type="text" name="name" id="name"><br><br>
+            Subject: <input type="text" name="sub" id="sub"><br><br>
+            Email: <input type="email" name="email" id="email"><br><br>
+            Phone: <input type="Number" name="phone" id="phone"><br><br>
+
+            <input type="submit" value="Update" name="Update">
+        </form>
+    </body>
+</html>

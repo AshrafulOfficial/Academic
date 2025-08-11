@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Product Profile</title>
+    <script>
+        function validateData(){
+            const name = document.getElementById("name").value.trim();
+            if(name === ""){
+                alert("Fill the Name");
+                return false;
+            }
+            if(!/^[a-zA-Z\s]+$/.test(name)){
+                alert("The name is invalid");
+                return false;
+            }
+
+            const category = document.getElementById("category").value.trim();
+            const valid_category = ["A","B","C"];
+            if(category === ""){
+                alert("Fill the category");
+                return false;
+            }
+            if(!valid_category.includes(category)){
+                alert("Invalid Category");
+                return false;
+            }
+
+            const brand = document.getElementById("brand").value.trim();
+            if(brand === ""){
+                alert("Fill the brand");
+                return false;
+            }
+            if(!/^[a-zA-Z0-9\s]+$/.test(brand)){
+                alert("Invalid brand");
+                return false;
+            }
+            
+            const color = document.getElementById("color").value.trim();
+            if(color === ""){
+                alert("Select a color");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+</head>
+<body>
+    <form action="insert_show.php" method="post" onsubmit="return validateData();">
+        Name: <input type="text" name="name" id="name"> <br><br>
+        Category: <input type="text" name="category" id="category"> <br><br>
+        Price: <input type="numeric" name="price" id="price" required> <br><br>
+        Brand: <input type="text" name="brand" id="brand"> <br><br>
+        Count: <input type="number" name="count" id="count" required> <br> <br>
+        Color: 
+        <select name="color" id="color">
+            <option value=""></option>
+            <option value="Green">Green</option>
+            <option value="White">White</option>
+            <option value="Black">Black</option>
+        </select>
+        <br><br>
+        Upload Image:
+        <input type="file" name="product_photo" id="product_photo" accept="image/*">
+        <br><br>
+        <input type="submit" name="Submit">
+    </form>
+</body>
+</html>

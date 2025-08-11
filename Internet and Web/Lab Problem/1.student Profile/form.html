@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Student Profile</title>
+        <script>
+            function validateform(){
+                const fname = document.getElementById("fname").value.trim();
+                if(fname === ""){
+                    alert("First Name is required");
+                    return false;
+                }
+                if(!/^[a-zA-Z\s]+$/.test(fname)){
+                    alert("The invalid fname");
+                    return false;
+                }
+
+                const lname= document.getElementById("lname").value.trim();
+                if(lname === ""){
+                    alert("Last Name is required");
+                    return false;
+                }
+                if(!/^[a-zA-Z\s]+$/.test(lname)){
+                    alert("The invalid fname");
+                    return false;
+                }
+                
+                const checkgender = document.querySelector('input[name="gender"]:checked');
+                if(!checkgender){
+                    alert("The gender is required");
+                    return false;
+                }
+
+                const roll = document.getElementById("roll").value.trim();
+                if(roll === ""){
+                    alert("The roll is required");
+                    return false;
+                }
+
+                const nationality = document.getElementById("nationality").value.trim();
+                if(nationality === ""){
+                    alert("The nationality is required");
+                    return false;
+                }
+                if(!/^[a-zA-Z/s]+$/.test(nationality)){
+                    alert("The invalid nationality");
+                    return false;
+                }
+
+                const dept = document.getElementById("dept").value;
+                if (dept === "") {
+                alert("Please select a department.");
+                return false;
+                }
+
+                const bloodgroup = document.getElementById("blood_group").value;
+                const validgroup = ["A+","A-","B+","B-","AB+","AB-","O+","O-"];
+                if(!validgroup.includes(bloodgroup)){
+                    alert("Please select a valid blood group");
+                    return false;
+                }
+
+                return true;
+            }
+        </script>
+    </head>
+    <body>
+        <h2>Student Form</h2>
+        <form action="profile.php" method="post" onsubmit="return validateform();">
+            First Name: <input type="text" name="fname" id="fname"><br><br>
+            Last Name: <input type="text" name="lname" id="lname"><br><br>
+            Gender:
+            <label><input type="radio" name="gender" value="Male"> Male</label>
+            <label><input type="radio" name="gender" value="Female"> Female</label><br><br>
+
+            Roll: <input type="Number" name="roll" id="roll" required><br><br>
+            Nationality: <input type="text" name="nationality" id="nationality"><br><br>
+            Date of Birth: <input type="date" name="dob" id="dob" required> <br><br>
+            Department: 
+                <select name="dept" id="dept">
+                    <option value=""></option>
+                    <option value="CSE">CSE</option>
+                    <option value="EEE">EEE</option>
+                    <option value="ESE">ESE</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Journalism">Journalism</option>
+                    <option value="HRM">HRM</option>
+                </select> <br><br>
+            Blood Group: <input type="text" name="blood_group" id="blood_group"><br><br>
+            <input type="submit" value="Submit">
+        </form>
+    </body>
+</html>

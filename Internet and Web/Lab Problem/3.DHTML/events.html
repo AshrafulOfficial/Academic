@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Events Example</title>
+    <script>
+        function showMessage(){
+            document.getElementById("message").innerHTML = "I am a CSE student";
+        }
+    </script>
+</head>
+<body>
+    <h2 onmouseover="showMessage()">Over for Hover</h2>
+
+    <button onclick="showMessage()">Click this button</button>
+     <br><br>
+    <input type="text" placeholder="Press here" onkeypress="showMessage()">
+    <div id="message"></div>
+</body>
+</html>
