@@ -1,0 +1,76 @@
+# C/C++ generated files
+*.o
+*.obj
+*.exe
+*.out
+*.app
+*.dll
+*.so
+*.dylib
+
+# Python generated files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Logs and databases
+*.log
+*.sql
+*.sqlite
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Build directories
+bin/
+obj/
+Debug/
+Release/
+x64/
+x86/
+
+# Temporary files
+*.tmp
+*.temp
