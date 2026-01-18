@@ -19,7 +19,7 @@ int main(){
                 else{
                     valid = false;
                 }
-                break;
+                break; //without break it will check next cases
             case 1:
                 if(isalnum(input[i])){
                     state = 1;
