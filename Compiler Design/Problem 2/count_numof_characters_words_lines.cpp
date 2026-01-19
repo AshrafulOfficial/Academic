@@ -1,33 +1,32 @@
 #include<bits/stdc++.h>
 using namespace std;
 int main(){
-    ifstream file("input.txt");
-
-    int lineCount=0, characterCount=0, wordCount=0;
     string line;
+    int lineCount = 0, characterCount = 0, wordCount = 0;
 
+    ifstream file("input.txt");
     while(getline(file, line)){
         lineCount++;
-
         characterCount = characterCount + line.length();
 
-        bool inWord = false;
-        for(char ch : line){
-            if(isspace(ch)){    //isspace checks space,tabs,newline, carrige return
-                inWord = false;
+        bool inword = false;
+        for(int i=0; i<line.length(); i++){
+            if(isspace(line[i])){
+                inword = false;
             }
-            else if(!inWord){
+            else if(inword == false){
                 wordCount++;
-                inWord = true;
+                inword = true;
             }
         }
     }
 
     file.close();
 
-    cout<<"The number of characters: "<<characterCount<<endl;
-    cout<<"The number of line: "<<lineCount<<endl;
-    cout<<"The number of word: "<<wordCount<<endl;
+    cout<<"Number of line: "<<lineCount<<endl;
+    cout<<"Number of character: "<<characterCount<<endl;
+    cout<<"Number of word: "<<wordCount<<endl;
 
     return 0;
+
 }

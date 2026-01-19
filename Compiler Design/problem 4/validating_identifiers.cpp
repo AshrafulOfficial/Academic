@@ -1,48 +1,47 @@
 #include<bits/stdc++.h>
 using namespace std;
-int main() {
-    string identifier;
-    string keywords[] = {"int", "float", "double", "void", "using", 
-        "if", "else", "char", "for", "while", "do", "else", "case", 
-        "switch", "break", "main", "return", "continue", "struct", 
-        "class", "long", "true", "flase", "bool", "namespace", "private",
-        "public", "new", "default", "signed", "unsigned", "detect"};
+int main(){
+    string id;
 
-    cin>>identifier;
+    cout<<"Enter a identifier: ";
+    cin>>id;
 
-    bool test = false;
-    if(identifier[0] == '_' || isalpha(identifier[0])){
-        for(int i=1; i<identifier.size(); i++){
-            if(identifier[i] == '_' || isalpha(identifier[i]) || isdigit(identifier[i])){
-                test = true;
+    string key[] = {"int", "float", "double", "long", "if", "else", "break", "continue", 
+                    "return", "using", "namespace", "void", "public", "private", "delete",
+                    "for", "while", "char", "string", "struct", "new", "bool", "true",
+                    "false", "signed", "unsigned","default", "swicth", "case", "class"};
+
+    bool valid = false;
+    if(id[0] == '_' || isalpha(id[0])){
+        for(int i=1; i<id.length(); i++){
+            if(id[i] == '_' || isalnum(id[i])){
+                valid = true;
             }
             else{
-                test = false;
+                valid = false;
                 break;
             }
         }
     }
 
-    if(test == true){
-        for(int i=0; i<sizeof(keywords)/sizeof(keywords[0]); i++){
-            if(identifier == keywords[i]){
-                test = false;
+    if(valid == true){
+        for(int i=0; i<sizeof(key)/sizeof(key[0]); i++){
+            if(id == key[i]){
+                valid = false;
                 break;
             }
             else{
-                test = true;
+                valid = true;
             }
         }
     }
 
-    if(test == true){
-        cout<<"This is a valid identifier."<<endl;
+    if(valid == true){
+        cout<<"The identifier is valid."<<endl;
     }
     else{
-        cout<<"This is a invalid identifier."<<endl;
+        cout<<"The identifier is invalid."<<endl;
     }
 
     return 0;
-
 }
-    

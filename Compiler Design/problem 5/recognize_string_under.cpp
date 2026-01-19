@@ -2,6 +2,7 @@
 using namespace std;
 int main(){
     string s;
+    cout<<"Enter a strings: ";
     cin>>s;
 
     if(s == "a"){
@@ -11,23 +12,25 @@ int main(){
         cout<<"The pattern matched: abb"<<endl;
     }
     else{
-        int i=0, count_b = 0;
-
-        while(i<s.length() && s[i] == 'a'){
+        int i=0;
+        while(s[i] == 'a' && i<s.length()){
             i++;
         }
 
-        while(i<s.length() && s[i] == 'b'){
-            count_b ++;
+        int count = 0;
+
+        while(s[i] == 'b' && i<s.length()){
             i++;
+            count++;
         }
 
-        if(i == s.length() && count_b >= 1){
-            cout<<"The pattern is matched: a*b+"<<endl;
+        if(i == s.length() && count >= 1){
+        cout<<"The pattern matched: a*b+"<<endl;
         }
         else{
-            cout<<"The pattern is not matched."<<endl;
+            cout<<"Pattern Doesen't matched."<<endl;
         }
     }
+
     return 0;
 }
