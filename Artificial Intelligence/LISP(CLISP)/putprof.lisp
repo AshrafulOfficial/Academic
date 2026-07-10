@@ -1,0 +1,6 @@
+(setf (get 'ball 'color) 'red)
+(setf (get 'ball 'size) 'small)
+(setf (get 'ball 'material) 'rubber)
+(print (get 'ball 'color))
+(print (get 'ball 'size))
+(print (get 'ball 'material))
