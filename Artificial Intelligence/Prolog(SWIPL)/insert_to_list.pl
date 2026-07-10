@@ -1,0 +1,2 @@
+list_insert(X,L,R) :-
+	list_delete(X,R,L).
