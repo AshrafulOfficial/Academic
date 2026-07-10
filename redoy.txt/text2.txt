@@ -1,0 +1,1000 @@
+========================================
+01: additive
+
+#include <iostream>
+#include <string>
+#include <cctype>
+using namespace std;
+
+int main() {
+    string text, cipher = "", plain = "";
+    int key;
+
+    cout << "Enter plaintext (letters only): ";
+    getline(cin, text);
+    cout << "Enter key (shift value): ";
+    cin >> key;
+
+    // Normalize key to range [0,25]
+    key = key % 26;
+
+    // Encryption
+    for (char c : text) {
+        if (isalpha(c)) {
+            char base = isupper(c) ? 'A' : 'a';
+            cipher += (c - base + key) % 26 + base;
+        } else {
+            cipher += c; // preserve spaces and punctuation
+        }
+    }
+
+    // Decryption
+    for (char c : cipher) {
+        if (isalpha(c)) {
+            char base = isupper(c) ? 'A' : 'a';
+            plain += (c - base - key + 26) % 26 + base;
+        } else {
+            plain += c;
+        }
+    }
+
+    cout << "Encrypted Output: " << cipher << endl;
+    cout << "Decrypted Output: " << plain << endl;
+
+    return 0;
+}
+========================================
+02: multiplicative
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+// function to find modular inverse
+int modInverse(int k) {
+    for (int i = 1; i < 26; i++) {
+        if ((k * i) % 26 == 1) return i;
+    }
+    return -1; // no inverse exists
+}
+
+int main() {
+    string text, cipher = "", plain = "";
+    int key;
+
+    cout << "Enter plaintext (letters only): ";
+    getline(cin, text);
+    cout << "Enter key: ";
+    cin >> key;
+
+    int inv = modInverse(key);
+    if (inv == -1) {
+        cout << "Invalid key! No modular inverse exists for this key under mod 26." << endl;
+        return 0;
+    }
+
+    // Encryption
+    for (char c : text) {
+        if (c == ' ') {
+            cipher += ' ';
+        } else if (isalpha(c)) {
+            char base = isupper(c) ? 'A' : 'a';
+            cipher += ((c - base) * key) % 26 + base;
+        } else {
+            cipher += c; // preserve non-alphabetic characters
+        }
+    }
+
+    // Decryption
+    for (char c : cipher) {
+        if (c == ' ') {
+            plain += ' ';
+        } else if (isalpha(c)) {
+            char base = isupper(c) ? 'A' : 'a';
+            plain += ((c - base) * inv) % 26 + base;
+        } else {
+            plain += c;
+        }
+    }
+
+    cout << "Encrypted Output: " << cipher << endl;
+    cout << "Decrypted Output: " << plain << endl;
+
+    return 0;
+}
+========================================
+03: affine
+
+#include <iostream>
+#include <string>
+#include <cctype>
+using namespace std;
+
+int modInverse(int a) {
+    for (int i = 1; i < 26; i++) {
+        if ((a * i) % 26 == 1) return i;
+    }
+    return -1; // no inverse exists
+}
+
+int main() {
+    string text, cipher = "", plain = "";
+    int a, b;
+
+    cout << "Enter plaintext: ";
+    getline(cin, text);
+    cout << "Enter key a (must be coprime with 26): ";
+    cin >> a;
+    cout << "Enter key b: ";
+    cin >> b;
+
+    int inv = modInverse(a);
+    if (inv == -1) {
+        cout << "Invalid key 'a'! It has no modular inverse modulo 26." << endl;
+        return 0;
+    }
+
+    // Encryption
+    for (char c : text) {
+        if (isalpha(c)) {
+            char base = isupper(c) ? 'A' : 'a';
+            cipher += ((a * (c - base) + b) % 26) + base;
+        } else {
+            cipher += c; // preserve spaces/punctuation
+        }
+    }
+
+    // Decryption
+    for (char c : cipher) {
+        if (isalpha(c)) {
+            char base = isupper(c) ? 'A' : 'a';
+            plain += (inv * ((c - base - b + 26) % 26)) % 26 + base;
+        } else {
+            plain += c;
+        }
+    }
+
+    cout << "Encrypted Output: " << cipher << endl;
+    cout << "Decrypted Output: " << plain << endl;
+
+    return 0;
+}
+========================================
+04: autokey
+
+#include <iostream>
+#include <string>
+#include <cctype>
+using namespace std;
+
+int main() {
+    string text, key;
+    cout << "Enter plaintext: ";
+    getline(cin, text);
+    cout << "Enter key (word): ";
+    getline(cin, key);
+
+    // Build extended key using only letters from plaintext
+    string fullKey = key;
+    for (int i = 0; fullKey.size() < text.size(); i++) {
+        if (isalpha(text[i])) {
+            fullKey += toupper(text[i]);
+        }
+    }
+
+    string cipher = "";
+    int ki = 0;
+    // Encryption
+    for (char c : text) {
+        if (!isalpha(c)) {
+            cipher += c; // preserve spaces/punctuation
+        } else {
+            char base = isupper(c) ? 'A' : 'a';
+            char k = toupper(fullKey[ki]);
+            cipher += ((c - base) + (k - 'A')) % 26 + base;
+            ki++;
+        }
+    }
+
+    string plain = "";
+    string tempKey = key;
+    int ti = 0;
+    // Decryption
+    for (char c : cipher) {
+        if (!isalpha(c)) {
+            plain += c;
+        } else {
+            char base = isupper(c) ? 'A' : 'a';
+            char k = toupper(tempKey[ti]);
+            char p = ((c - base) - (k - 'A') + 26) % 26 + base;
+            plain += p;
+            tempKey += toupper(p); // extend key with decrypted letter
+            ti++;
+        }
+    }
+
+    cout << "Encrypted Output: " << cipher << endl;
+    cout << "Decrypted Output: " << plain << endl;
+
+    return 0;
+}
+========================================
+05: playfair
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+char mat[5][5];
+
+string cleanText(string s) {
+    string r = "";
+    for (char c : s) {
+        if (c >= 'a' && c <= 'z') c -= 32; // to uppercase
+        if (c >= 'A' && c <= 'Z') {
+            if (c == 'J') c = 'I'; // merge J with I
+            r += c;
+        }
+    }
+    return r;
+}
+
+void buildMatrix(string key) {
+    bool used[26] = {false};
+    used['J' - 'A'] = true; // J excluded
+    string temp = cleanText(key);
+
+    string full = "";
+    for (char c : temp) {
+        if (!used[c - 'A']) {
+            used[c - 'A'] = true;
+            full += c;
+        }
+    }
+    for (char c = 'A'; c <= 'Z'; c++) {
+        if (!used[c - 'A']) {
+            used[c - 'A'] = true;
+            full += c;
+        }
+    }
+
+    int k = 0;
+    for (int i = 0; i < 5; i++)
+        for (int j = 0; j < 5; j++)
+            mat[i][j] = full[k++];
+}
+
+string makePairs(string s) {
+    s = cleanText(s);
+    string r = "";
+    for (int i = 0; i < s.size(); i++) {
+        r += s[i];
+        if (i + 1 < s.size() && s[i] == s[i + 1]) {
+            r += 'X';
+        }
+    }
+    if (r.size() % 2 != 0) r += 'X';
+    return r;
+}
+
+void findPos(char c, int &row, int &col) {
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 5; j++) {
+            if (mat[i][j] == c) {
+                row = i;
+                col = j;
+                return;
+            }
+        }
+    }
+}
+
+string process(string text, int dir) {
+    string r = "";
+    for (int i = 0; i < text.size(); i += 2) {
+        int r1, c1, r2, c2;
+        findPos(text[i], r1, c1);
+        findPos(text[i + 1], r2, c2);
+
+        if (r1 == r2) {
+            r += mat[r1][(c1 + dir + 5) % 5];
+            r += mat[r2][(c2 + dir + 5) % 5];
+        } else if (c1 == c2) {
+            r += mat[(r1 + dir + 5) % 5][c1];
+            r += mat[(r2 + dir + 5) % 5][c2];
+        } else {
+            r += mat[r1][c2];
+            r += mat[r2][c1];
+        }
+    }
+    return r;
+}
+
+int main() {
+    string text, key;
+    cout << "Enter plaintext: ";
+    getline(cin, text);
+    cout << "Enter keyword: ";
+    getline(cin, key);
+
+    buildMatrix(key);
+    string prepared = makePairs(text);
+    string cipher = process(prepared, 1);
+    string plain = process(cipher, -1);
+
+    cout << "Encrypted Output: " << cipher << endl;
+    cout << "Decrypted Output: " << plain << endl;
+
+    return 0;
+}
+========================================
+06: vigenere
+
+#include <iostream>
+#include <string>
+#include <cctype>
+using namespace std;
+
+int main() {
+    string text, key, fullKey = "", cipher = "", plain = "";
+
+    cout << "Enter plaintext: ";
+    getline(cin, text);
+    cout << "Enter keyword: ";
+    getline(cin, key);
+
+    // generate full key (skip spaces/punctuation)
+    int j = 0;
+    for (int i = 0; i < text.size(); i++) {
+        if (isalpha(text[i])) {
+            fullKey += key[j % key.size()];
+            j++;
+        } else {
+            fullKey += text[i]; // preserve spaces/punctuation
+        }
+    }
+
+    // Encryption
+    for (int i = 0; i < text.size(); i++) {
+        if (isalpha(text[i])) {
+            char base = isupper(text[i]) ? 'A' : 'a';
+            char kbase = isupper(fullKey[i]) ? 'A' : 'a';
+            cipher += ( (text[i] - base) + (toupper(fullKey[i]) - 'A') ) % 26 + base;
+        } else {
+            cipher += text[i];
+        }
+    }
+
+    // Decryption
+    for (int i = 0; i < cipher.size(); i++) {
+        if (isalpha(cipher[i])) {
+            char base = isupper(cipher[i]) ? 'A' : 'a';
+            char kbase = isupper(fullKey[i]) ? 'A' : 'a';
+            plain += ( (cipher[i] - base) - (toupper(fullKey[i]) - 'A') + 26 ) % 26 + base;
+        } else {
+            plain += cipher[i];
+        }
+    }
+
+    cout << "Encrypted Output: " << cipher << endl;
+    cout << "Decrypted Output: " << plain << endl;
+
+    return 0;
+}
+========================================
+07: hill
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+int modInverse(int a) {
+    for (int i = 1; i < 26; i++)
+        if ((a * i) % 26 == 1) return i;
+    return -1;
+}
+
+int main() {
+    string text;
+    int k[2][2];
+
+    cout << "Enter plaintext: ";
+    getline(cin, text);
+
+    cout << "Enter 2x2 key matrix: ";
+    for (int i = 0; i < 2; i++)
+        for (int j = 0; j < 2; j++)
+            cin >> k[i][j];
+
+    // remove spaces & uppercase
+    string t = "";
+    for (char c : text) {
+        if (c != ' ') t += toupper(c);
+    }
+    if (t.size() % 2 != 0) t += 'X';
+
+    string cipher = "", plain = "";
+
+    // Encryption
+    for (int i = 0; i < t.size(); i += 2) {
+        int a = t[i] - 'A', b = t[i + 1] - 'A';
+        cipher += char((k[0][0] * a + k[0][1] * b) % 26 + 'A');
+        cipher += char((k[1][0] * a + k[1][1] * b) % 26 + 'A');
+    }
+
+    // Inverse matrix
+    int det = (k[0][0] * k[1][1] - k[0][1] * k[1][0]) % 26;
+    if (det < 0) det += 26;
+    int invDet = modInverse(det);
+    if (invDet == -1) {
+        cout << "Key matrix is not invertible modulo 26." << endl;
+        return 0;
+    }
+
+    int inv[2][2];
+    inv[0][0] = (k[1][1] * invDet) % 26;
+    inv[1][1] = (k[0][0] * invDet) % 26;
+    inv[0][1] = ((-k[0][1] * invDet) % 26 + 26) % 26;
+    inv[1][0] = ((-k[1][0] * invDet) % 26 + 26) % 26;
+
+    // Decryption
+    for (int i = 0; i < cipher.size(); i += 2) {
+        int a = cipher[i] - 'A', b = cipher[i + 1] - 'A';
+        plain += char((inv[0][0] * a + inv[0][1] * b) % 26 + 'A');
+        plain += char((inv[1][0] * a + inv[1][1] * b) % 26 + 'A');
+    }
+
+    cout << "Encrypted Output: " << cipher << endl;
+    cout << "Decrypted Output: " << plain << endl;
+
+    return 0;
+}
+========================================
+08: keyless
+
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+string encrypt(string text, int rail) {
+    vector<string> r(rail);
+    int row = 0, dir = 1;
+
+    for (char c : text) {
+        r[row] += c;
+        if (row == 0) dir = 1;
+        else if (row == rail - 1) dir = -1;
+        row += dir;
+    }
+
+    string cipher = "";
+    for (string s : r) cipher += s;
+    return cipher;
+}
+
+string decrypt(string cipher, int rail) {
+    vector<vector<char>> mat(rail, vector<char>(cipher.size(), '\n'));
+    int row = 0, dir = 1;
+
+    // mark zig-zag positions
+    for (int i = 0; i < cipher.size(); i++) {
+        mat[row][i] = '*';
+        if (row == 0) dir = 1;
+        else if (row == rail - 1) dir = -1;
+        row += dir;
+    }
+
+    // fill marked positions with ciphertext
+    int k = 0;
+    for (int i = 0; i < rail; i++)
+        for (int j = 0; j < cipher.size(); j++)
+            if (mat[i][j] == '*' && k < cipher.size())
+                mat[i][j] = cipher[k++];
+
+    // read plaintext in zig-zag
+    string plain = "";
+    row = 0, dir = 1;
+    for (int i = 0; i < cipher.size(); i++) {
+        plain += mat[row][i];
+        if (row == 0) dir = 1;
+        else if (row == rail - 1) dir = -1;
+        row += dir;
+    }
+
+    return plain;
+}
+
+int main() {
+    string text;
+    int rail;
+
+    cout << "Enter plaintext: ";
+    getline(cin, text);
+    cout << "Enter number of rails: ";
+    cin >> rail;
+
+    string cipher = encrypt(text, rail);
+    string plain = decrypt(cipher, rail);
+
+    cout << "Encrypted Output: " << cipher << endl;
+    cout << "Decrypted Output: " << plain << endl;
+
+    return 0;
+}
+========================================
+09: keyed
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cctype>
+using namespace std;
+
+string cleanText(string s) {
+    string r = "";
+    for (char c : s) {
+        if (c != ' ') r += c; // keep original case, just remove spaces
+    }
+    return r;
+}
+
+vector<pair<char, int>> getOrder(string key) {
+    vector<pair<char, int>> order;
+    for (int i = 0; i < key.size(); i++) {
+        order.push_back({tolower(key[i]), i}); // sort by lowercase for consistency
+    }
+    stable_sort(order.begin(), order.end());
+    return order;
+}
+
+int main() {
+    string text, key;
+    cout << "Enter plaintext: ";
+    getline(cin, text);
+    cout << "Enter keyword: ";
+    getline(cin, key);
+
+    text = cleanText(text);
+    int col = key.size();
+    int row = (text.size() + col - 1) / col;
+
+    while (text.size() < row * col) text += 'x'; // pad with lowercase x
+
+    vector<vector<char>> mat(row, vector<char>(col));
+    int k = 0;
+    for (int i = 0; i < row; i++)
+        for (int j = 0; j < col; j++)
+            mat[i][j] = text[k++];
+
+    vector<pair<char, int>> order = getOrder(key);
+
+    // Encryption
+    string cipher = "";
+    for (auto p : order) {
+        int c = p.second;
+        for (int i = 0; i < row; i++)
+            cipher += mat[i][c];
+    }
+
+    // Decryption
+    vector<vector<char>> dmat(row, vector<char>(col));
+    k = 0;
+    for (auto p : order) {
+        int c = p.second;
+        for (int i = 0; i < row; i++)
+            dmat[i][c] = cipher[k++];
+    }
+
+    string plain = "";
+    for (int i = 0; i < row; i++)
+        for (int j = 0; j < col; j++)
+            plain += dmat[i][j];
+
+    // strip padding
+    while (!plain.empty() && plain.back() == 'x') plain.pop_back();
+
+    cout << "Encrypted Output: " << cipher << endl;
+    cout << "Decrypted Output: " << plain << endl;
+
+    return 0;
+}
+========================================
+10: hybrid
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+string railFenceEncrypt(string text, int r) {
+    vector<string> rail(r);
+    int row = 0, dir = 1;
+
+    for (char c : text) {
+        rail[row] += c; // include spaces and preserve case
+        if (row == 0) dir = 1;
+        else if (row == r - 1) dir = -1;
+        row += dir;
+    }
+
+    string res = "";
+    for (string s : rail) res += s;
+    return res;
+}
+
+string railFenceDecrypt(string cipher, int r) {
+    vector<vector<char>> mat(r, vector<char>(cipher.size(), '\n'));
+    int row = 0, dir = 1;
+
+    // mark zig-zag positions
+    for (int i = 0; i < cipher.size(); i++) {
+        mat[row][i] = '*';
+        if (row == 0) dir = 1;
+        else if (row == r - 1) dir = -1;
+        row += dir;
+    }
+
+    // fill marked positions with ciphertext
+    int k = 0;
+    for (int i = 0; i < r; i++)
+        for (int j = 0; j < cipher.size(); j++)
+            if (mat[i][j] == '*')
+                mat[i][j] = cipher[k++];
+
+    // read plaintext in zig-zag
+    string res = "";
+    row = 0, dir = 1;
+    for (int i = 0; i < cipher.size(); i++) {
+        res += mat[row][i];
+        if (row == 0) dir = 1;
+        else if (row == r - 1) dir = -1;
+        row += dir;
+    }
+    return res;
+}
+
+int main() {
+    string text;
+    int rail;
+
+    cout << "Enter plaintext: ";
+    getline(cin, text);
+    cout << "Enter number of rails: ";
+    cin >> rail;
+
+    string step1 = railFenceEncrypt(text, rail);
+
+    // second step (reverse)
+    string cipher = step1;
+    reverse(cipher.begin(), cipher.end());
+
+    // decryption
+    string step2 = cipher;
+    reverse(step2.begin(), step2.end());
+    string plain = railFenceDecrypt(step2, rail);
+
+    cout << "Encrypted Output: " << cipher << endl;
+    cout << "Decrypted Output: " << plain << endl;
+
+    return 0;
+}
+========================================
+11: feistel
+
+#include <iostream>
+using namespace std;
+
+// Simple round function: XOR with key and add key
+int roundFunction(int R, int key) {
+    return (R ^ key) + key;
+}
+
+int main() {
+    int plaintext, numRounds;
+    cout << "Enter plaintext (integer): ";
+    cin >> plaintext;
+    cout << "Enter number of rounds: ";
+    cin >> numRounds;
+
+    int keys[10];
+    for (int i = 0; i < numRounds; i++) {
+        cout << "Enter key for round " << i + 1 << ": ";
+        cin >> keys[i];
+    }
+
+    // Split plaintext into two halves (16-bit plaintext → 8-bit halves)
+    int L = (plaintext >> 8) & 0xFF;
+    int R = plaintext & 0xFF;
+
+    cout << "\nEncryption Rounds:" << endl;
+    for (int i = 0; i < numRounds; i++) {
+        int newL = R;
+        int newR = L ^ roundFunction(R, keys[i]);
+        L = newL;
+        R = newR;
+        cout << "Round " << i + 1 << ": L = " << L << ", R = " << R << endl;
+    }
+
+    int ciphertext = (L << 8) | (R & 0xFF);
+    cout << "Encrypted Output: " << ciphertext << endl;
+
+    cout << "\nDecryption Rounds:" << endl;
+    for (int i = numRounds - 1; i >= 0; i--) {
+        int newR = L;
+        int newL = R ^ roundFunction(L, keys[i]);
+        R = newR;
+        L = newL;
+        cout << "Round " << (numRounds - i) << ": L = " << L << ", R = " << R << endl;
+    }
+
+    int decrypted = (L << 8) | (R & 0xFF);
+    cout << "Decrypted Output: " << decrypted << endl;
+
+    return 0;
+}
+========================================
+12: rsa
+
+#include <iostream>
+using namespace std;
+
+long long power(long long base, long long exp, long long mod) {
+    long long result = 1;
+    base %= mod;
+    while (exp > 0) {
+        if (exp % 2 == 1)
+            result = result * base % mod;
+        exp /= 2;
+        base = base * base % mod;
+    }
+    return result;
+}
+
+long long gcd(long long a, long long b) {
+    return b == 0 ? a : gcd(b, a % b);
+}
+
+long long modInverse(long long e, long long phi) {
+    long long t = 0, newT = 1, r = phi, newR = e;
+    while (newR != 0) {
+        long long q = r / newR;
+        t = t - q * newT; swap(t, newT);
+        r = r - q * newR; swap(r, newR);
+    }
+    if (t < 0) t = (t % phi + phi) % phi; // safe normalization
+    return t;
+}
+
+int main() {
+    long long p, q;
+    cout << "Enter prime p: ";
+    cin >> p;
+    cout << "Enter prime q: ";
+    cin >> q;
+
+    long long n = p * q;
+    long long phi = (p - 1) * (q - 1);
+
+    long long e = 2;
+    while (e < phi && gcd(e, phi) != 1) e++;
+
+    long long d = modInverse(e, phi);
+
+    cout << "\nPublic Key: (" << e << ", " << n << ")" << endl;
+    cout << "Private Key: (" << d << ", " << n << ")" << endl;
+
+    long long M;
+    cout << "Enter message (integer < " << n << "): ";
+    cin >> M;
+
+    long long C = power(M, e, n);
+    long long decrypted = power(C, d, n);
+
+    cout << "Encrypted Output: " << C << endl;
+    cout << "Decrypted Output: " << decrypted << endl;
+
+    return 0;
+}
+========================================
+13: dss_dsa
+
+#include <iostream>
+using namespace std;
+
+long long power(long long base, long long exp, long long mod) {
+    long long result = 1;
+    base %= mod;
+    while (exp > 0) {
+        if (exp & 1) result = result * base % mod;
+        exp >>= 1;
+        base = base * base % mod;
+    }
+    return result;
+}
+
+long long modInverse(long long a, long long m) {
+    long long t = 0, newT = 1, r = m, newR = a;
+    while (newR != 0) {
+        long long q = r / newR;
+        t = t - q * newT; swap(t, newT);
+        r = r - q * newR; swap(r, newR);
+    }
+    if (t < 0) t = (t % m + m) % m; // safe normalization
+    return t;
+}
+
+int main() {
+    // Simplified DSA parameters (small values for demonstration)
+    long long p = 23, q = 11, g = 4;
+    long long x = 6; // Private key
+    long long y = power(g, x, p); // Public key
+
+    cout << "DSA Parameters:" << endl;
+    cout << "p = " << p << ", q = " << q << ", g = " << g << endl;
+    cout << "Private Key x = " << x << endl;
+    cout << "Public Key y = " << y << endl;
+
+    long long H = 9; // Hash of the message (simplified)
+    long long k = 7; // Random per-signature value
+
+    // Signing
+    long long r = power(g, k, p) % q;
+    long long kInv = modInverse(k, q);
+    long long s = (kInv * (H + x * r)) % q;
+
+    cout << "\nMessage Hash H = " << H << endl;
+    cout << "Signature: (r = " << r << ", s = " << s << ")" << endl;
+
+    // Verification
+    long long w = modInverse(s, q);
+    long long u1 = (H * w) % q;
+    long long u2 = (r * w) % q;
+    long long v = (power(g, u1, p) * power(y, u2, p)) % p % q;
+
+    cout << "\nVerification steps:" << endl;
+    cout << "w = " << w << ", u1 = " << u1 << ", u2 = " << u2 << endl;
+    cout << "Verification value v = " << v << endl;
+
+    if (v == r)
+        cout << "Signature is VALID." << endl;
+    else
+        cout << "Signature is INVALID." << endl;
+
+    return 0;
+}
+========================================
+14: rabin
+
+#include <iostream>
+using namespace std;
+
+long long power(long long base, long long exp, long long mod) {
+    long long result = 1;
+    base %= mod;
+    while (exp > 0) {
+        if (exp & 1) result = result * base % mod;
+        exp >>= 1;
+        base = base * base % mod;
+    }
+    return result;
+}
+
+long long extGCD(long long a, long long b, long long &x, long long &y) {
+    if (b == 0) { x = 1; y = 0; return a; }
+    long long x1, y1;
+    long long g = extGCD(b, a % b, x1, y1);
+    x = y1;
+    y = x1 - (a / b) * y1;
+    return g;
+}
+
+int main() {
+    long long p, q;
+    cout << "Enter prime p (p % 4 == 3): ";
+    cin >> p;
+    cout << "Enter prime q (q % 4 == 3): ";
+    cin >> q;
+
+    long long n = p * q;
+    cout << "Public Key n = " << n << endl;
+
+    long long M;
+    cout << "Enter message M (0 <= M < " << n << "): ";
+    cin >> M;
+
+    // Encryption
+    long long C = (M * M) % n;
+    cout << "Encrypted Output (C): " << C << endl;
+
+    // Square roots modulo p and q
+    long long r = power(C, (p + 1) / 4, p);
+    long long s = power(C, (q + 1) / 4, q);
+
+    // Extended Euclidean Algorithm
+    long long a, b;
+    extGCD(p, q, a, b);
+
+    // Normalize coefficients modulo n
+    a = (a % n + n) % n;
+    b = (b % n + n) % n;
+
+    // Combine roots using CRT
+    long long x = ( (a * p % n) * s % n + (b * q % n) * r % n ) % n;
+    long long y = ( ( (a * p % n) * s % n - (b * q % n) * r % n ) % n + n ) % n;
+
+    cout << "\nFour possible plaintexts:" << endl;
+    cout << x << ", " << (n - x) % n << ", " << y << ", " << (n - y) % n << endl;
+
+    return 0;
+}
+========================================
+15: knapsack
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+long long modInverse(long long t, long long m) {
+    long long t0 = 0, t1 = 1, r0 = m, r1 = t;
+    while (r1 != 0) {
+        long long q = r0 / r1;
+        t0 = t0 - q * t1; swap(t0, t1);
+        r0 = r0 - q * r1; swap(r0, r1);
+    }
+    if (t0 < 0) t0 = (t0 % m + m) % m; // safe normalization
+    return t0;
+}
+
+int main() {
+    // Superincreasing private key
+    vector<long long> W = {2, 3, 7, 14, 30, 57, 120, 251};
+    int n = W.size();
+
+    long long m = 491; // m > sum(W)
+    long long t = 41;  // gcd(t, m) = 1
+
+    // Generate public key
+    vector<long long> B(n);
+    for (int i = 0; i < n; i++)
+        B[i] = (t * W[i]) % m;
+
+    cout << "Public Key B: ";
+    for (long long b : B) cout << b << " ";
+    cout << endl;
+
+    // Plaintext as binary string
+    string plaintext;
+    cout << "Enter plaintext bits (8 bits, e.g. 11001010): ";
+    cin >> plaintext;
+    if (plaintext.size() != n) {
+        cout << "Error: plaintext must be exactly " << n << " bits." << endl;
+        return 1;
+    }
+
+    // Encryption
+    long long C = 0;
+    for (int i = 0; i < n; i++)
+        if (plaintext[i] == '1') C += B[i];
+
+    cout << "Encrypted Output: " << C << endl;
+
+    // Decryption
+    long long invT = modInverse(t, m);
+    long long Cprime = (invT * C) % m;
+    cout << "C' (after multiplying by inverse): " << Cprime << endl;
+
+    string recovered = "";
+    for (int i = n - 1; i >= 0; i--) {
+        if (Cprime >= W[i]) {
+            recovered = "1" + recovered;
+            Cprime -= W[i];
+        } else {
+            recovered = "0" + recovered;
+        }
+    }
+
+    cout << "Decrypted Output: " << recovered << endl;
+
+    return 0;
+}

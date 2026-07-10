@@ -1,0 +1,366 @@
+========================================
+01: Basic Signal Generation
+
+n = -5:19;
+u = double(n >= 0);
+imp = double(n == 0);
+ramp = n .* (n >= 0);
+t = 0:19;
+sine = sin(2*pi*0.1*t);
+cosine = cos(2*pi*0.1*t);
+subplot(5,1,1); stem(n,u); title('Unit Step u[n]');
+subplot(5,1,2); stem(n,imp); title('Unit Impulse \delta[n]');
+subplot(5,1,3); stem(n,ramp); title('Ramp Signal');
+subplot(5,1,4); stem(t,sine); title('Sine Wave');
+subplot(5,1,5); stem(t,cosine); title('Cosine Wave');
+
+
+========================================
+02: Signal Operations
+
+x = [1 2 3 4];
+n = 0:3;
+n0 = 2;
+n_shift = n + n0; % time shifting
+x_scale = 2 * x; % scaling
+n_rev = -fliplr(n);
+x_rev = fliplr(x); % reversal
+subplot(2,2,1); stem(n,x); title('Original x[n]');
+subplot(2,2,2); stem(n_shift,x); title('Shifted x[n-2]');
+subplot(2,2,3); stem(n,x_scale); title('Scaled 2x[n]');
+subplot(2,2,4); stem(n_rev,x_rev); title('Reversed x[-n]');
+
+
+========================================
+03: Even and Odd Decomposition
+
+n = -4:4;
+x = (n >= 0) .* exp(-0.3*n);
+x_rev = fliplr(x);
+xe = 0.5 * (x + x_rev);
+xo = 0.5 * (x - x_rev);
+subplot(3,1,1); stem(n,x); title('Original x[n]');
+subplot(3,1,2); stem(n,xe); title('Even Component xe[n]');
+subplot(3,1,3); stem(n,xo); title('Odd Component xo[n]');
+check = max(abs(x - (xe + xo))); % should be ~0
+disp(check);
+
+
+========================================
+04: Sampling of Analog Signal
+
+f = 5; % signal frequency in Hz
+t = linspace(0,1,2000);
+x = sin(2*pi*f*t);
+fs_list = [10 40 6]; % Nyquist, above, below
+titles = {'Nyquist Rate (fs=10Hz)','Above Nyquist (fs=40Hz)','Below Nyquist (fs=6Hz)'};
+for i = 1:3
+fs = fs_list(i);
+tn = 0:1/fs:1;
+xn = sin(2*pi*f*tn);
+subplot(3,1,i);
+plot(t,x,'--'); hold on;
+stem(tn,xn,'r');
+title(titles{i});
+end
+
+
+========================================
+05: Aliasing Demonstration
+
+f = 8;
+t = linspace(0,1,2000);
+x = sin(2*pi*f*t);
+fs1 = 40; % properly sampled
+tn1 = 0:1/fs1:1;
+subplot(2,1,1);
+plot(t,x,'--'); hold on;
+stem(tn1, sin(2*pi*f*tn1), 'r');
+title('Properly Sampled (fs=40Hz)');
+fs2 = 9; % undersampled -> aliasing
+tn2 = 0:1/fs2:1;
+subplot(2,1,2);
+plot(t,x,'--'); hold on;
+stem(tn2, sin(2*pi*f*tn2), 'r');
+title('Undersampled (fs=9Hz) - Aliasing');
+
+
+========================================
+06: Reconstruction
+
+f = 3;
+t = linspace(0,1,2000);
+x = sin(2*pi*f*t);
+fs = 15;
+tn = 0:1/fs:1;
+xn = sin(2*pi*f*tn);
+t_fine = linspace(0, tn(end), 500);
+x_recon = interp1(tn, xn, t_fine, 'spline');
+plot(t,x,'--'); hold on;
+stem(tn,xn,'r');
+plot(t_fine, x_recon, 'g');
+legend('Original','Samples','Reconstructed');
+title('Original vs Reconstructed Signal');
+
+
+========================================
+07: Uniform Quantizer
+
+t = linspace(0,1,500);
+x = sin(2*pi*3*t);
+L = 8; % number of quantization levels
+xq = round((x+1)/2 * (L-1)) / (L-1) * 2 - 1;
+plot(t,x); hold on;
+stairs(t,xq,'r');
+legend('Input sine wave','Quantized output');
+title('Uniform Quantizer Output');
+
+
+========================================
+08: Quantization Error Analysis
+
+t = linspace(0,1,500);
+x = sin(2*pi*3*t);
+L = 8;
+xq = round((x+1)/2 * (L-1)) / (L-1) * 2 - 1;
+err = x - xq;
+mse = mean(err.^2);
+plot(t, err);
+title(['Quantization Error Signal (MSE = ' num2str(mse) ')']);
+xlabel('t'); ylabel('Error');
+disp(mse);
+
+
+========================================
+09: Effect of Bit Resolution
+
+t = linspace(0,1,500);
+x = sin(2*pi*3*t);
+bits_list = [2 4 8];
+for i = 1:3
+b = bits_list(i);
+L = 2^b;
+xq = round((x+1)/2 * (L-1)) / (L-1) * 2 - 1;
+mse = mean((x-xq).^2);
+subplot(3,1,i);
+plot(t,x); hold on;
+stairs(t,xq,'r');
+title([num2str(b) '-bit Quantization (MSE=' num2str(mse) ')']);
+end
+
+
+========================================
+10: Discrete Fourier Transform (DFT)
+
+N = 32;
+n = 0:N-1;
+x = sin(2*pi*4*n/N) + 0.5*sin(2*pi*8*n/N);
+X_fft = fft(x);
+X_manual = zeros(1,N);
+for k = 0:N-1
+s = 0;
+for m = 0:N-1
+s = s + x(m+1) * exp(-1j*2*pi*k*m/N);
+end
+X_manual(k+1) = s;
+end
+subplot(2,1,1); stem(n, abs(X_fft)); title('Magnitude Spectrum (Built-in fft)');
+subplot(2,1,2); stem(n, abs(X_manual)); title('Magnitude Spectrum (Manual DFT)');
+
+
+========================================
+11: Frequency Spectrum Analysis
+
+fs = 200;
+t = 0:1/fs:1-1/fs;
+x = sin(2*pi*10*t) + 0.6*sin(2*pi*30*t) + 0.3*sin(2*pi*50*t);
+X = fft(x);
+f = (0:length(x)-1) * fs / length(x);
+subplot(2,1,1); plot(t,x); title('Composite Signal (10, 30, 50 Hz)');
+subplot(2,1,2); plot(f(1:end/2), abs(X(1:end/2))); title('Magnitude Spectrum');
+xlabel('Frequency (Hz)');
+
+
+========================================
+12: Short-Time Fourier Transform (STFT)
+
+fs = 500;
+t = 0:1/fs:2-1/fs;
+x_stat = sin(2*pi*40*t);
+x_nonstat = [sin(2*pi*20*t(1:end/2)) sin(2*pi*80*t(end/2+1:end))];
+subplot(2,1,1);
+spectrogram(x_stat, 128, [], [], fs, 'yaxis');
+title('Spectrogram: Stationary Signal (40 Hz)');
+subplot(2,1,2);
+spectrogram(x_nonstat, 128, [], [], fs, 'yaxis');
+title('Spectrogram: Non-stationary Signal (20 Hz -> 80 Hz)');
+
+
+========================================
+13: Statistical Measures
+
+x = randn(1,1000)*2 + 1;
+mu = mean(x);
+sigma2 = var(x);
+sigma = std(x);
+sk = skewness(x);
+ku = kurtosis(x) - 3; % excess kurtosis
+disp([mu sigma2 sigma sk ku]);
+histogram(x, 30);
+title('Histogram of Signal (for Statistical Analysis)');
+
+
+========================================
+14: Correlation and Covariance
+
+n = 0:99;
+x = sin(2*pi*0.05*n) + 0.2*randn(1,100);
+y = circshift(x,5) + 0.2*randn(1,100);
+[autoc, lags] = xcorr(x,x);
+[crossc, ~] = xcorr(x,y);
+subplot(2,1,1); plot(lags, autoc); title('Auto-correlation of x[n]');
+subplot(2,1,2); plot(lags, crossc); title('Cross-correlation of x[n] and y[n]');
+
+C = cov(x,y);
+disp(C);
+
+
+========================================
+15: Random Signal Analysis
+
+noise = randn(1,1000);
+subplot(2,1,1); plot(noise); title('White Gaussian Noise Signal');
+subplot(2,1,2); histogram(noise, 30); title('Histogram (Approx. Gaussian Distribution)');
+disp(mean(noise));
+disp(var(noise));
+
+
+========================================
+16: Low-Pass Filter Design
+
+fs = 500;
+t = 0:1/fs:1-1/fs;
+clean = sin(2*pi*5*t);
+noisy = clean + 0.5*randn(1,length(t));
+b = fir1(30, 20/(fs/2)); % FIR low-pass, cutoff 20 Hz
+filtered = filtfilt(b, 1, noisy);
+subplot(2,1,1); plot(t,noisy); title('Noisy Signal (Before Filtering)');
+subplot(2,1,2); plot(t,filtered); title('After FIR Low-Pass Filtering (fc=20Hz)');
+
+
+========================================
+17: High-Pass Filter Design
+
+fs = 500;
+t = 0:1/fs:1-1/fs;
+x = sin(2*pi*5*t) + 3; % sine wave with DC offset
+b = fir1(30, 2/(fs/2), 'high'); % high-pass, cutoff 2 Hz
+x_filtered = filtfilt(b, 1, x);
+subplot(2,1,1); plot(t,x); title('Original Signal with DC Offset');
+subplot(2,1,2); plot(t,x_filtered); title('After DC Removal (High-Pass Filter)');
+
+
+========================================
+18: IIR Filter Design
+
+fs = 500;
+t = 0:1/fs:1-1/fs;
+clean = sin(2*pi*5*t);
+noisy = clean + 0.5*randn(1,length(t));
+[bb, aa] = butter(4, 20/(fs/2)); % 4th order Butterworth, cutoff 20 Hz
+filtered_iir = filtfilt(bb, aa, noisy);
+subplot(2,1,1); plot(t,noisy); title('Noisy Signal (Before Filtering)');
+subplot(2,1,2); plot(t,filtered_iir); title('After Butterworth IIR Filtering (fc=20Hz)');
+
+
+========================================
+19: Frequency Response
+
+fs = 500;
+[bb, aa] = butter(4, 20/(fs/2));
+[h, w] = freqz(bb, aa, 512, fs);
+subplot(2,1,1); plot(w, 20*log10(abs(h)));
+title('Magnitude Response'); xlabel('Frequency (Hz)'); ylabel('Magnitude (dB)');
+subplot(2,1,2); plot(w, unwrap(angle(h)));
+title('Phase Response'); xlabel('Frequency (Hz)'); ylabel('Phase (rad)');
+
+
+========================================
+20: Filter Comparison
+
+fs = 500;
+b_fir = fir1(30, 20/(fs/2));
+[bb_iir, aa_iir] = butter(4, 20/(fs/2));
+[h_fir, w_fir] = freqz(b_fir, 1, 512, fs);
+[h_iir, w_iir] = freqz(bb_iir, aa_iir, 512, fs);
+plot(w_fir, 20*log10(abs(h_fir))); hold on;
+plot(w_iir, 20*log10(abs(h_iir)));
+legend('FIR','IIR (Butterworth)');
+title('FIR vs IIR Magnitude Response');
+xlabel('Frequency (Hz)'); ylabel('Magnitude (dB)');
+
+
+========================================
+21: Noise Removal Project
+
+fs = 500;
+t = 0:1/fs:1-1/fs;
+clean = sin(2*pi*5*t);
+noisy = clean + 0.5*randn(1,length(t));
+b = fir1(30, 20/(fs/2));
+filtered = filtfilt(b, 1, noisy);
+snr_before = 10*log10(sum(clean.^2) / sum((noisy-clean).^2));
+snr_after = 10*log10(sum(clean.^2) / sum((filtered-clean).^2));
+subplot(2,1,1); plot(t,noisy);
+title(['Noisy Signal (SNR = ' num2str(snr_before) ' dB)']);
+subplot(2,1,2); plot(t,filtered);
+title(['Filtered Signal (SNR = ' num2str(snr_after) ' dB)']);
+
+
+========================================
+22: Speech Signal Analysis
+
+% [x, fs] = audioread('speech.wav'); % use this line with a real audio file
+fs = 4000;
+t = 0:1/fs:1-1/fs;
+x = sin(2*pi*150*t) .* (1 + 0.5*sin(2*pi*3*t)) + 0.3*sin(2*pi*900*t);
+subplot(2,1,1); plot(t,x); title('Speech-like Signal (Waveform)');
+subplot(2,1,2);
+spectrogram(x, 256, [], [], fs, 'yaxis');
+title('STFT Spectrogram of Speech-like Signal');
+
+
+========================================
+23: Aliasing and Filtering Combined
+
+f = 45;
+fs_low = 50; % too low for f=45 Hz -> aliasing
+tn = 0:1/fs_low:1;
+aliased = sin(2*pi*f*tn);
+fs_high = 200;
+tn_hi = 0:1/fs_high:1;
+x_hi = sin(2*pi*f*tn_hi);
+b = fir1(30, 20/(fs_high/2)); % anti-aliasing low-pass filter
+x_filtered = filtfilt(b, 1, x_hi);
+subplot(2,1,1); stem(tn, aliased);
+title('Aliased Signal (Undersampled at 50 Hz)');
+subplot(2,1,2); plot(tn_hi, x_filtered);
+title('After Anti-Aliasing Low-Pass Filter (Pre-sampling)');
+
+
+========================================
+24: Signal Classification (Basic Introduction)
+
+t = linspace(0,1,200);
+sig_sine = sin(2*pi*5*t);
+sig_square = square(2*pi*5*t);
+sig_noise = randn(1,200);
+sig_ramp = linspace(-1,1,200);
+signals = {sig_sine, sig_square, sig_noise, sig_ramp};
+labels = {'Sine','Square','Noise','Ramp'};
+means = cellfun(@mean, signals);
+vars = cellfun(@var, signals);
+subplot(1,2,1); bar(means); set(gca,'XTickLabel',labels); title('Mean of Each Signal Type');
+subplot(1,2,2); bar(vars); set(gca,'XTickLabel',labels); title('Variance of Each Signal Type');
+
+
