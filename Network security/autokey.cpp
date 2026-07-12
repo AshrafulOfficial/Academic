@@ -21,9 +21,8 @@ int main() {
             char base = isupper(c) ? 'A' : 'a';
 
             int p = c - base;
-            int ciph = (p + prevKey) % 26;
 
-            cipher += ciph + base;
+            cipher += (p + prevKey) % 26 + base;
 
             // Next key = current plaintext value
             prevKey = p;
@@ -40,12 +39,11 @@ int main() {
             char base = isupper(c) ? 'A' : 'a';
 
             int ciph = c - base;
-            int p = (ciph - prevKey + 26) % 26;
 
-            plain += p + base;
+            plain += (ciph - prevKey + 26) % 26 + base;
 
             // Next key = decrypted plaintext value
-            prevKey = p;
+            prevKey = (ciph - prevKey + 26) % 26;
         } else {
             plain += c;
         }
