@@ -4,48 +4,50 @@
 using namespace std;
 
 int main() {
-    string text, key;
+    string text, cipher = "", plain = "";
+    int key;
+
     cout << "Enter plaintext: ";
     getline(cin, text);
-    cout << "Enter key (word): ";
-    getline(cin, key);
 
-    // Build extended key using only letters from plaintext
-    string fullKey = key;
-    for (int i = 0; fullKey.size() < text.size(); i++) {
-        if (isalpha(text[i])) {
-            fullKey += toupper(text[i]);
-        }
-    }
+    cout << "Enter numeric key (0-25): ";
+    cin >> key;
 
-    string cipher = "";
-    int ki = 0;
+    int prevKey = key;
+
     // Encryption
     for (char c : text) {
-        if (!isalpha(c)) {
-            cipher += c; // preserve spaces/punctuation
-        } else {
+        if (isalpha(c)) {
             char base = isupper(c) ? 'A' : 'a';
-            char k = toupper(fullKey[ki]);
-            cipher += ((c - base) + (k - 'A')) % 26 + base;
-            ki++;
+
+            int p = c - base;
+            int ciph = (p + prevKey) % 26;
+
+            cipher += ciph + base;
+
+            // Next key = current plaintext value
+            prevKey = p;
+        } else {
+            cipher += c;
         }
     }
 
-    string plain = "";
-    string tempKey = key;
-    int ti = 0;
+    prevKey = key;
+
     // Decryption
     for (char c : cipher) {
-        if (!isalpha(c)) {
-            plain += c;
-        } else {
+        if (isalpha(c)) {
             char base = isupper(c) ? 'A' : 'a';
-            char k = toupper(tempKey[ti]);
-            char p = ((c - base) - (k - 'A') + 26) % 26 + base;
-            plain += p;
-            tempKey += toupper(p); // extend key with decrypted letter
-            ti++;
+
+            int ciph = c - base;
+            int p = (ciph - prevKey + 26) % 26;
+
+            plain += p + base;
+
+            // Next key = decrypted plaintext value
+            prevKey = p;
+        } else {
+            plain += c;
         }
     }
 
