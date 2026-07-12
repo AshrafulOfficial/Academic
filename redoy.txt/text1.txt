@@ -271,7 +271,7 @@ Query: ?- list_insert(5,[6,4,3,1],R).
 
 Experiment 16: Write a LISP program applying basic LIST manipulation function and verify their operation
 ----------------------------------------------------
-(setq mylist '(10 20 30 40 50))
+(setq mylist '(10 20 30 40 50))z
 
 (print (car mylist))
 (print (cdr mylist))
